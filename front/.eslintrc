@@ -1,0 +1,21 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true // jsx html에서 jsp, xml 사용가능
+    }
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ], // eslint의 코딩 스타일을 적용.
+  "plugins": [
+    "import",
+    "react-hooks"
+  ]
+}

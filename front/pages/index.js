@@ -2,7 +2,6 @@
 // react-hook 문법을 차용
 
 import React from 'react';
-import Link from 'next/link';
 import Head from 'next/head';
 import AppLayout from '../Components/AppLayout';
 

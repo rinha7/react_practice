@@ -1,27 +1,41 @@
-import React, {useState} from 'react';
-import AppLayout from '../Components/AppLayout';
-import Head from 'next/head'
-import {Form,Input, Checkbox, Button} from "antd";
+import React, { useState, useCallback } from 'react';
+import { Button, Checkbox, Form, Input } from 'antd';
+import PropTypes from 'prop-types';
+const TextInput = ({value}) => {
+    return (
+
+    );
+};
+TextInput.propTypes = {
+    value : PropTypes.string,
+
+};
 
 const Signup = () => {
-    const [id,setId] = useState('');
-    const [nick,setNick] = useState('');
-    const [password,setPassword] = useState('');
-    const [passwordCheck,setPasswordCheck] = useState('');
+    const [passwordCheck, setPasswordCheck] = useState('');
     const [term, setTerm] = useState(false);
-    const [passwordError, setPasswordError] = useState('');
-    const [termError, setTermError] = useState('');
+    const [passwordError, setPasswordError] = useState(false);
+    const [termError, setTermError] = useState(false);
 
-    const onSubmit = (e) => {
+    const useInput = (initValue = null) => {
+        const [value, setter] = useState(initValue);
+        const handler = useCallback((e) => {
+            setter(e.target.value);
+        },[]);
+        return [value, handler];
+    };
+
+    const [id, onChangeId] = useInput('');
+    const [nick, onChangeNick] = useInput('');
+    const [password, onChangePassword] = useInput('');
+
+    const onSubmit = useCallback((e) => {
         e.preventDefault();
-        if (password != passwordCheck){
+        if (password !== passwordCheck) {
             return setPasswordError(true);
         }
-        if(!term){
+        if (!term) {
             return setTermError(true);
-        }
-        else{
-            return setTermError(false);
         }
         console.log({
             id,
@@ -30,78 +44,55 @@ const Signup = () => {
             passwordCheck,
             term,
         });
-    };
-    const onChangeId = (e) => {
-        setId(e.target.value);
-    };
-    const onChangeNick = (e) => {
-        setNick(e.target.value);
-    };
-    const onChangePassword = (e) => {
-        setPassword(e.target.value);
-    };
+    },[password, passwordCheck, term]); // dependency들이 바뀔때 eventListener 동작함.
+    // usecallback을 사용? 함수 또한 객체이기 때문에, 새로 실행하면 새로운 객체가 생성되어버림
+    // 그러다 보면 의도치 않은 re-rendering이 발생함.
+
     const onChangePasswordCheck = (e) => {
         setPasswordError(e.target.value !== password);
         setPasswordCheck(e.target.value);
     };
-    const onChangeTerm = (e) => {
-        setTerm (e.target.checked);
-    };
-    // custom Hook
-    // const useInput = (initValue = null) =>{
-    //     const [value, setter] = useState(initValue);
-    //     const handler = (e) => {
-    //         setter(e.target.value);
-    //     };
-    //     return [value, handler];
-    // };
-    // custom hook을 이용하면 코드를 좀 줄일 수 있다.
-    //
-    // const[id,onChangeId] = useInput(''); 를 통해 onchangeid와 const[id,setid]부분을 대체 가능.
-    // 이 방식의 코드를 사용하면, const onchangeid 와 const [id,setid] 부분을 제거할 수 있음
-    // 중복되는 코드 ~~(e.target.value) 를 좀 더 간편한 코드로 바꾸어 줄 수 있다.
 
+    const onChangeTerm = (e) => {
+        setTermError(false);
+        setTerm(e.target.checked);
+    };
 
     return (
         <>
-            <Head>
-                <title> radi's home</title>
-                <link rel ="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.20.5/antd.css"/>
-            </Head>
-        <AppLayout>
-        {/*Library 쓰지 않고 만드는 Form*/}
-        <Form onSubmit={onSubmit} style={{padding : 10}}>
-            <div>
-                <label htmlFor="user-id">ID</label>
-                <br/>
-                <Input name="user-id" value={id} required onChange={onChangeId}/>
+        <Form onSubmit={onSubmit} style={{ padding: 10 }}>
+<div>
+    <label htmlFor="user-id">아이디</label>
+        <br />
+        <Input name="user-id" value={id} required onChange={onChangeId} />
+    </div>
+    <div>
+    <label htmlFor="user-nick">닉네임</label>
+        <br />
+        <Input name="user-nick" value={nick} required onChange={onChangeNick} />
+    </div>
+    <div>
+    <label htmlFor="user-password">비밀번호</label>
+        <br />
+        <Input name="user-password" type="password" value={password} required onChange={onChangePassword} />
+    </div>
+    <div>
+    <label htmlFor="user-password-check">비밀번호체크</label>
+        <br />
+        <Input name="user-password-check" type="password" value={passwordCheck} required
+    onChange={onChangePasswordCheck} />
+    {passwordError && <div style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</div>}
+    </div>
+    <div>
+    <Checkbox name="user-term" value={term} onChange={onChangeTerm}>회원가입 약관에 동의합니다.</Checkbox>
+        {termError && <div style={{ color: 'red' }}>약관에 동의하셔야 합니다.</div>}
+        </div>
+        <div style={{ marginTop: 10 }}>
+        <Button type="primary" htmlType="submit">가입하기</Button>
             </div>
-            <div>
-                <label htmlFor="user-nick">nickname</label>
-                <br/>
-                <Input name="user-nick" value={nick} required onChange={onChangeNick}/>
-            </div>
-            <div>
-                <label htmlFor="user-pw" >Password</label>
-                <br/>
-                <Input name="user-pw"  type="password" value={password}required onChange={onChangePassword}/>
-            </div>
-            <div>
-                <label htmlFor="user-pwcheck">Password-check</label>
-                <br/>
-                <Input name="user-pwcheck" type="password" value={passwordCheck} required onChange={onChangePasswordCheck}/>
-                {passwordError && <div style={{color : 'red'}}> password not equal </div> }
-            </div>
-            <div>
-                <Checkbox name="user-term" value={term}  onChange={onChangeTerm}>약관 동의</Checkbox>
-                {termError && <div style={{color:'red'}}> Plz check the term</div>}
-            </div>
-            <div>
-                <Button type="primary"  htmlType="submit">Sign Up</Button>
-            </div>
-        </Form>
-        </AppLayout>
-        </>
-    );
+            </Form>
+            </>
+        );
 };
+
 export default Signup;

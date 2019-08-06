@@ -1,14 +1,23 @@
 import React, { useState, useCallback } from 'react';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Form, Input, Checkbox, Button } from 'antd';
 import PropTypes from 'prop-types';
-const TextInput = ({value}) => {
+
+const TextInput = ({ value }) => {
     return (
-
-    );
+        <div>{value}</div>
+)
 };
-TextInput.propTypes = {
-    value : PropTypes.string,
 
+TextInput.propTypes = {
+    value: PropTypes.string,
+};
+
+export const useInput = (initValue = null) => {
+    const [value, setter] = useState(initValue);
+    const handler = useCallback((e) => {
+        setter(e.target.value);
+    }, []);
+    return [value, handler];
 };
 
 const Signup = () => {
@@ -16,14 +25,6 @@ const Signup = () => {
     const [term, setTerm] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [termError, setTermError] = useState(false);
-
-    const useInput = (initValue = null) => {
-        const [value, setter] = useState(initValue);
-        const handler = useCallback((e) => {
-            setter(e.target.value);
-        },[]);
-        return [value, handler];
-    };
 
     const [id, onChangeId] = useInput('');
     const [nick, onChangeNick] = useInput('');
@@ -37,32 +38,24 @@ const Signup = () => {
         if (!term) {
             return setTermError(true);
         }
-        console.log({
-            id,
-            nick,
-            password,
-            passwordCheck,
-            term,
-        });
-    },[password, passwordCheck, term]); // dependency들이 바뀔때 eventListener 동작함.
-    // usecallback을 사용? 함수 또한 객체이기 때문에, 새로 실행하면 새로운 객체가 생성되어버림
-    // 그러다 보면 의도치 않은 re-rendering이 발생함.
+    }, [password, passwordCheck, term]);
 
-    const onChangePasswordCheck = (e) => {
+    const onChangePasswordCheck = useCallback((e) => {
         setPasswordError(e.target.value !== password);
         setPasswordCheck(e.target.value);
-    };
+    }, [password]);
 
-    const onChangeTerm = (e) => {
+    const onChangeTerm = useCallback((e) => {
         setTermError(false);
         setTerm(e.target.checked);
-    };
+    }, []);
 
     return (
         <>
         <Form onSubmit={onSubmit} style={{ padding: 10 }}>
-<div>
-    <label htmlFor="user-id">아이디</label>
+<TextInput value="135135" />
+        <div>
+        <label htmlFor="user-id">아이디</label>
         <br />
         <Input name="user-id" value={id} required onChange={onChangeId} />
     </div>
@@ -79,12 +72,11 @@ const Signup = () => {
     <div>
     <label htmlFor="user-password-check">비밀번호체크</label>
         <br />
-        <Input name="user-password-check" type="password" value={passwordCheck} required
-    onChange={onChangePasswordCheck} />
+        <Input name="user-password-check" type="password" value={passwordCheck} required onChange={onChangePasswordCheck} />
     {passwordError && <div style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</div>}
     </div>
     <div>
-    <Checkbox name="user-term" value={term} onChange={onChangeTerm}>회원가입 약관에 동의합니다.</Checkbox>
+    <Checkbox name="user-term" value={term} onChange={onChangeTerm}>제로초 말을 잘 들을 것을 동의합니다.</Checkbox>
         {termError && <div style={{ color: 'red' }}>약관에 동의하셔야 합니다.</div>}
         </div>
         <div style={{ marginTop: 10 }}>

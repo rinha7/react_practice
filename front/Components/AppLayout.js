@@ -5,6 +5,7 @@ import {Menu, Input, Button, Row, Col, Card, Avatar, Form} from "antd";
 import Link from "next/link";
 import PropTypes from 'prop-types';
 import LoginForm from "./LoginForm";
+import UserProfile from "./UserProfile"
 
 const dummy ={
     nickname: 'radi',
@@ -33,16 +34,7 @@ const AppLayout = ({children}) => {
     {/*xs 안의 숫자는 화면을 얼마나 차지할지를 의미함. 전체 길이는 24로, 8은 3등분 12는 2등분*/}
             <Col xs={24} md={6}>
         {dummy.isLoggedIn ?
-                <Card actions={[
-                    <div key="twit"> NumOfTwit <br/> {dummy.Post.length}</div>,
-                    <div key="following"> Following <br/> {dummy.Followings.length}</div>,
-                    <div key="follower"> Followers <br/> {dummy.Followers.length}</div>,
-]}>
-                    <Card.Meta
-                        avatar={<Avatar>{dummy.nickname[0]}</Avatar>}
-                        title={dummy.nickname}
-                        />
-                </Card>
+                <UserProfile />
                             :
                 <LoginForm/>
         }

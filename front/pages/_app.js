@@ -1,27 +1,39 @@
-// _app.js는 next에서 지정한 Layout을 모아둔 파일의 이름입니다.
-// 한 페이지를 Load할 때 자동으로 여러 Component가 렌더링되는 것을 막아줍니다.
-// 중복되는 부분을 제거함으로써 효율을 높일 수 있습니다
-
-
 import React from 'react';
 import Head from 'next/head';
-import AppLayout from "../Components/AppLayout";
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
+import withRedux from 'next-redux-wrapper';
+import AppLayout from '../Components/AppLayout';
+import { applyMiddleware, compose, createStore } from 'redux';
+import { Provider } from 'react-redux';
+import reducer from '../reducers';
 
-const NodeBird = ({Component}) =>{
+const NodeBird = ({ Component, store }) => {
     return (
-        <>
+        <Provider store={store}>
         <Head>
-            <title> radi's home</title>
-            <link rel ="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.20.5/antd.css"/>
+        <title>radis home</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css" />
         </Head>
         <AppLayout>
         <Component />
         </AppLayout>
-        </>
-    );
+        </Provider>
+);
 };
+
 NodeBird.propTypes = {
-    Component : PropTypes.elementType,
+    Component: PropTypes.elementType,
+    store: PropTypes.object,
 };
-export default NodeBird
+
+export default withRedux((initialState, options) => {
+    const middlewares = [];
+    // compose는 미들웨어를 합성할 수 있도록 해줌.
+    const enhancer = compose(
+        applyMiddleware(...middlewares),
+        // 기능들을 더 추가하고 싶다? 미들웨어를 사용하자
+        !options.isServer && typeof window.__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined' ? window.__REDUX_DEVTOOLS_EXTENSION__() : (f) => f,
+    );
+    const store = createStore(reducer, initialState, enhancer);
+    return store;
+})(NodeBird);
